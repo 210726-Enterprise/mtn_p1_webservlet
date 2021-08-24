@@ -96,29 +96,29 @@ public class UserService {
             } else {
                 switch (iDoWhatThough) {
                     case 0:
-                        lLog4j.debug("An HTTP Request for GET processed, returning 404 - Not Found.");
+                        lLog4j.debug("An HTTP Request for GET was processed, returning 404 - Not Found.");
                         res.setStatus(HttpServletResponse.SC_NOT_FOUND);
                         return;
                     case 1:
-                        lLog4j.debug("An HTTP Request for POST processed, returning 500 - Internal Server Error suggesting SQL database failed to perform row insert but did not throw back SQLException.");
+                        lLog4j.debug("An HTTP Request for POST was processed, returning 500 - Internal Server Error suggesting SQL database failed to perform row insert but did not throw back SQLException.");
                         res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                         return;
                     default:
-                        lLog4j.debug("An HTTP Request processed, returning 409 - Conflict suggesting operation failed in non-fatal way.");
+                        lLog4j.debug("An HTTP Request was processed, returning 409 - Conflict suggesting operation failed in non-fatal way.");
                         res.setStatus(HttpServletResponse.SC_CONFLICT);
                 }
             }
         } catch (BatchUpdateException e) {
-            lLog4j.debug("An HTTP Request for DELETE processed, returning 406 - Not Acceptable due to request attempting to delete multiple rows at once.");
+            lLog4j.debug("An HTTP Request for DELETE was processed, returning 406 - Not Acceptable due to request attempting to delete multiple rows at once.");
             res.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE);
         } catch (NoSuchElementException e) {
             if (iDoWhatThough == 2) {
                 // 422: The servlet understands the request, but cannot process the instructions.
-                lLog4j.debug("An HTTP Request for PUT processed, returning 422 - Unprocessable Entity suggesting request params/body failed to contain any non-null values for any non-primary key columns in the users table.");
+                lLog4j.debug("An HTTP Request for PUT was processed, returning 422 - Unprocessable Entity suggesting request params/body failed to contain any non-null values for any non-primary key columns in the users table.");
                 res.setStatus(422);
             } else {
                 lLog4j.error(e.getMessage());
-                lLog4j.error("An HTTP Request processed, throwing a NoSuchElementException in a context theoretically impossible via this servlet!!");
+                lLog4j.error("An HTTP Request was processed, throwing a NoSuchElementException in a context theoretically impossible via this servlet!!");
                 res.setStatus(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (Exception e) {
