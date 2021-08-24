@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.sql.BatchUpdateException;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
@@ -289,6 +290,22 @@ public class UserServiceTest {
 
         objService.doAnything(objReqMock, objRespMock,3);
         verify(objRespMock).setStatus(HttpServletResponse.SC_OK);
+        verifyNoMoreInteractions(objRespMock);
+    }
+
+    @Test
+    void doDelete_FromParams_NoPK_MatchesMultipleRows() throws IOException, SQLException, InvocationTargetException, IllegalAccessException {
+        when(objReqMock.getReader()).thenReturn(objReaderMock);
+        when(objReqMock.getReader().lines()).thenReturn(Stream.empty());
+        when(objReqMock.getParameter("id")).thenReturn(null);
+        when(objReqMock.getParameter("firstname")).thenReturn("test1");
+        when(objReqMock.getParameter("lastname")).thenReturn(null);
+        when(objReqMock.getParameter("emailaddress")).thenReturn(null);
+
+        when(objHandlerMock.delete(any(User.class))).thenThrow(new BatchUpdateException());
+
+        objService.doAnything(objReqMock, objRespMock,3);
+        verify(objRespMock).setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE);
         verifyNoMoreInteractions(objRespMock);
     }
 }

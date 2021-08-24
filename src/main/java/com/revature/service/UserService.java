@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.BatchUpdateException;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -89,7 +90,7 @@ public class UserService {
                     res.setStatus(HttpServletResponse.SC_OK);
                     return;
                 }
-                if ((Boolean) objReturn.get()) {
+                if ((Boolean)objReturn.get()) {
                     res.setStatus(HttpServletResponse.SC_OK);
                 }
             } else {
@@ -107,6 +108,9 @@ public class UserService {
                         res.setStatus(HttpServletResponse.SC_CONFLICT);
                 }
             }
+        } catch (BatchUpdateException e) {
+            lLog4j.debug("An HTTP Request for DELETE processed, returning 406 - Not Acceptable due to request attempting to delete multiple rows at once.");
+            res.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE);
         } catch (NoSuchElementException e) {
             if (iDoWhatThough == 2) {
                 // 422: The servlet understands the request, but cannot process the instructions.
@@ -115,7 +119,6 @@ public class UserService {
             } else {
                 lLog4j.error(e.getMessage());
                 lLog4j.error("An HTTP Request processed, throwing a NoSuchElementException in a context theoretically impossible via this servlet!!");
-                lLog4j.error("(Theoretical cause for NoSuchElementException being thrown this way: an ORM operation other than CREATE TABLE was attempted on a table that doesn't exist in database, or is under a different schema.)");
                 res.setStatus(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (Exception e) {
